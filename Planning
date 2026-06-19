@@ -1,0 +1,26 @@
+Key functions:
+
+- create bank accounts
+    - 2 types: Checking and Savings
+- log in / select an account
+- deposit money
+- withdraw money
+- transfer money between accounts
+- view account details
+- view transaction history
+
+Class structure:
+
+- Bank
+- Transaction
+- Account
+    displayAccountInfo()
+    displayTransactionHistory()
+    addTransaction(...)
+    deposit()
+    withdraw()
+    transfer()
+    getBalance()
+    checkPin()
+    changePin()
+
