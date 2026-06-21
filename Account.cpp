@@ -65,6 +65,28 @@ std::string Account::getHolderName() {
     return holderName;
 }
 
+void Account::initializeAccountType() {
+    int accountTypeInt = 0;
+    std::string accountTypeString;
+    std::cout<<"Is this a checking (Enter 1) or savings (Enter 2) account?"<<std::endl;
+    while(true) {
+        std::cin>>accountTypeInt;
+        if (accountTypeInt == 1) {
+            accountTypeString = "checking";
+            break;
+        }
+        else if (accountTypeInt == 2) {
+            accountTypeString = "savings";
+            break;
+        }
+        else {
+            std::cout<<"Invalid input. Enter an integer, either 1 or 2: "<<std::endl;
+        }
+    }
+    std::cout<<"Account is a "<<accountTypeString<<" account."<<std::endl;
+    Account::accountType = accountTypeString;
+}
+
 int Account::getDigitCount(int num) {
     int digitCount = 0;
     while (num/10 >= 1) {
