@@ -24,3 +24,30 @@ Class structure:
     checkPin()
     changePin()
 
+Restructure:
+Purpose: For a bank teller to execute transactions, get account details, and create accounts.
+
+Menu: 1. Create Account (1)
+        - Specify Account Type
+        - Assign Account Number //8-digit random number, check if already exists
+        - Set pin
+      2. View Account Details (2)
+        - View Account Details (1)
+        - View Transaction History (2)
+      3. Initiate a New Transaction (3)
+        - Deposit (1)
+        - Withdraw (2)
+        - Transfer //future feature
+
+Classes:
+- Account class: Manages account details and transactions, has deposit and withdraw methods.
+    - Holds transaction history ArrayList, each account gets their own history
+- Account Manager class:
+    - All accounts of type Account are stored in an ArrayList in this class
+    - Searching algorithm for account by account number, name, or date of birth.
+    - Create new account
+    - Delete account
+    - Edit account details
+
+
+
