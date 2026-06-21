@@ -3,33 +3,24 @@
 
 #include "Account.h"
 
-// TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-using namespace std;
-
-
 int main() {
     // TIP Press <shortcut actionId="RenameElement"/> when your caret is at the <b>lang</b> variable name to see how CLion can help you rename it.
 
 
-    cout << "Hello and welcome to the banking simulator." << endl;
+    std::cout << "Hello and welcome to the banking simulator.\n";
 
     int menuPress = 0;
-    cout << "This is the main menu. Here you can choose to add an account (enter 1), "
-            "view current account information (enter 2), or initiate a transaction (enter 3): " <<endl;
+    std::cout << "This is the main menu. Here you can choose to create an account, "
+            "view account details, or initiate a transaction: \n";
+    std::cout<<"Create an Account (1)\n";
+    std::cout<<"View Account Details (3)\n";
+    std::cout<<"New transaction (2)\n";
 
     while(true) {
-        cout<<"Enter your menu choice: ";
-        cin>>menuPress;
+        std::cout<<"Enter your menu choice: ";
+        std::cin>>menuPress;
         if (menuPress == 1) {
-            double initialBalance = 0;
-            cout<<"Specify the initial deposit being made ($500 minimum) to start the account: "<<endl;
-            while (initialBalance<500){
-                cin>>initialBalance;
-                if (initialBalance < 500) {
-                    cout<<"Invalid amount. Try again: "<<endl;
-                }
-            }
-            new Account(initialBalance);
+
             break;
         }
         else if (menuPress == 2) {
@@ -41,10 +32,10 @@ int main() {
             break;
         }
         else {
-            cout<<"Invalid input. Enter an integer 1-3. Try again"<<endl;
+            std::cout<<"Invalid input. Enter an integer 1-3. Try again.\n";
         }
     }
-    cin>>menuPress;
+    std::cin>>menuPress;
 
 
 
