@@ -189,6 +189,13 @@ void Account::addTransaction() {
     std::cin>>note;
     transactions.push_back(Transaction(type, trans_amount, balanceAfter, note));
 }
+
+void Account::getTransactionHistory() {
+    for (long long i=0;i<transactions.size();i++) {
+        transactions[i].display();
+    }
+}
+
 bool Account:: checkPin() {
     int userPin;
     std::cout<<"Enter your pin to continue";
