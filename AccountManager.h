@@ -11,7 +11,10 @@
 class AccountManager {
     public:
         AccountManager();
-        Account::Account search();
+        static std::vector<Account> accounts;
+        static long long searchAccounts(); //returns vector index of found account
+private:
+
 };
 
 
