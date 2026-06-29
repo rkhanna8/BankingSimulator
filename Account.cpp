@@ -65,6 +65,46 @@ std::string Account::getHolderName() {
     return holderName;
 }
 
+void Account::initializeAccountNumber() {
+    srand(time(NULL));
+    std::string prefix = (rand() % 999999) + 100000 + ""; //6-digit random number.
+    /*To implement if there are concerns regarding duplicate random numbers,
+    but all accounts are already uniqye because of last 6 digits referring
+    to the arrayList position of the account*/
+    /*bool isUnique = false;
+    while (!isUnique) {
+        //Code to check if prefix is already taken
+    }*/
+
+    std::string suffix = AccountManager::accounts.size()+"";
+
+    //Determine digits to go in between prefix and suffix to keep a consistent 12-digit number
+    std::string middleDigits;
+    switch (suffix.length()) {
+        case 1:
+            middleDigits = "00000";
+            break;
+        case 2:
+            middleDigits = "0000";
+            break;
+        case 3:
+            middleDigits = "000";
+            break;
+        case 4:
+            middleDigits = "00";
+            break;
+        case 5:
+            middleDigits = "0";
+            break;
+        case 6:
+            middleDigits = "";
+            break;
+    }
+
+    accountNumber = prefix + middleDigits + suffix;
+    //Limits to 1 million accounts that can be assigned
+}
+
 void Account::initializeAccountType() {
     int accountTypeInt = 0;
     std::string accountTypeString;
