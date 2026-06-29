@@ -111,13 +111,16 @@ void Account::initializeAccountType() {
     std::cout<<"Is this a checking (Enter 1) or savings (Enter 2) account?"<<std::endl;
     while(true) {
         std::cin>>accountTypeInt;
-        if (accountTypeInt == 1) {
-            accountTypeString = "checking";
-            break;
-        }
-        else if (accountTypeInt == 2) {
-            accountTypeString = "savings";
-            break;
+
+        switch (accountTypeInt) {
+            case 1:
+                accountTypeString = "checking";
+                break;
+            case 2:
+                accountTypeString = "savings";
+                break;
+            default:
+                std::cout<<"Invalid input. Enter an integer, either 1 or 2:\n";
         }
         else {
             std::cout<<"Invalid input. Enter an integer, either 1 or 2: "<<std::endl;
