@@ -168,6 +168,34 @@ void Account::transfer(Account& toAccount, double amount) {
     toAccount.deposit(amount);
     withdraw(amount);
 }
+
+void Account::displayDetails() {
+    if (!checkPin()) {
+        return;
+    }
+    std::cout<<"Account number: "<<accountNumber<<"\nHolder name: "<<holderName<<"\nAccount type: "<<accountType<<"\nBalance: "<<balance<<"\n";
+    std::cout<<"Would you  like to check transaction history?\n1. Yes\n2. No";
+    int checkTransactionHistory;
+    std::cin>>checkTransactionHistory;
+    while (true) {
+        switch (checkTransactionHistory) {
+            case 1:
+                std::cout<<"Transaction history: ";
+                getTransactionHistory();
+                std::cout<<"Returning to main menu...";
+                break;
+            case 2:
+                std::cout<<"Returning to main menu...";
+                break;
+            default:
+                std::cout<<"Invalid input. Try again.\n";
+                std::cout<<"Would you  like to check transaction history?\n1. Yes\n2. No";
+                std::cin>>checkTransactionHistory;
+        }
+    }
+
+}
+
 void Account::addTransaction() {
     std::string type;
     std::cout<<"Enter type of transaction: ";
