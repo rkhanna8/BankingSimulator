@@ -136,6 +136,11 @@ int Account::getDigitCount(int num) {
     return digitCount;
 }
 
+std::string Account::getAccountNumber() {
+    return accountNumber;
+}
+
+
 double Account::deposit(double amount) {
     if (amount<=0) {
         std::cout<<"Invalid amount. Transaction unsuccessful.";
