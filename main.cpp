@@ -25,14 +25,15 @@ int main() {
         }
         else if (menuPress == 2) {
 
-            break;
-        }
-        else if (menuPress == 3) {
-
-            break;
-        }
-        else {
-            std::cout<<"Invalid input. Enter an integer 1-3. Try again.\n";
+        switch (menuPress) {
+            case 1:
+                std::cout<<"Create an account: ";
+            case 2:
+                std::cout<<"View account details: ";
+            case 3:
+                std::cout<<"New transaction: ";
+            default:
+                std::cout<<"Invalid input. Enter an integer 1-3. Try again.\n";
         }
     }
     std::cin>>menuPress;
