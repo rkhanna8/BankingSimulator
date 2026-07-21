@@ -12,25 +12,30 @@ class Account {
 private:
     double balance;
     int pin;
-    int accountNumber;
-    std::vector<Transaction> transactions;
+    std::string accountNumber;
     std::string holderName;
-    void addTransaction();
     std::string accountType;
+    void initializeAccountType();
+    void initializeAccountNumber();
 
 public:
-    Account(double initialBalance);
-    double deposit(double amount);
-    double withdraw(double amount);
+    Account();
+
+    std::vector<Transaction> transactions;
+
+    void newTransaction();
+    void deposit(double amount);
+    void withdraw(double amount);
     double getBalance() const; //These four are all declarations of methods that will be written in Account.cpp
-    void transfer(Account& toAccount, double amount);
-    bool checkPin();
+    //void transfer(Account& toAccount, double amount);
+    bool checkPin() const;
     void changePin();
-    void getTransactions();
+    void getTransactionHistory();
     std::string getHolderName();
     std::string getAccountType();
     void setAccountType(std::string accountType);
-
+    std::string getAccountNumber();
+    void displayDetails();
     static int getDigitCount(int num);
 
 

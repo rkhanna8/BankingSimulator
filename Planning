@@ -50,4 +50,11 @@ Classes:
     - Edit account details
 
 
+Steps:
+1. Backend (C++)
+    - Read database data at bootup
+2. Database (Firebase)
+3. Frontend (HTML + JS)
+    - UI, interactive professional platform
+
 

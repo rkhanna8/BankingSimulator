@@ -15,13 +15,17 @@ private:
     double balanceAfter;
     std::string note;
 public:
+
+    Transaction();
+
     std::string getType() const;
-    double getAmount() const;
+    double getTransAmount() const;
     double getBalanceAfter() const;
-    std::string getNote() const;
+    //std::string getNote() const;
+    void initializeTransactionType();
 
     void display() const;
-    Transaction(std::string type, double trans_amount, double balanceAfter, std::string note);
+
 
 };
 

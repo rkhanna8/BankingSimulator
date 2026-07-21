@@ -9,4 +9,6 @@ add_executable(BankingSimulator main.cpp
         Transaction.cpp
         Transaction.h
         AccountManager.cpp
-        AccountManager.h)
+        AccountManager.h
+        Utils.cpp
+        Utils.h)

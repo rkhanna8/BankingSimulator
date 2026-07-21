@@ -1,0 +1,27 @@
+{
+  "metadata": {
+    "schemaVersion": 1,
+    "currency": "USD",
+    "amountUnit": "cents"
+  },
+  "accounts": {
+    "123456000000": {
+      "accountNumber": "123456000000",
+      "holderName": "Demo Customer",
+      "accountType": "checking",
+      "balanceCents": 0,
+      "pinHash": "$2b$12$REPLACE_WITH_A_REAL_BCRYPT_HASH",
+      "createdAt": "2026-07-21T00:00:00Z",
+      "updatedAt": "2026-07-21T00:00:00Z",
+      "transactions": {
+        "demo-transaction": {
+          "type": "deposit",
+          "amountCents": 0,
+          "balanceAfterCents": 0,
+          "note": "Schema example; replace or remove after import",
+          "createdAt": "2026-07-21T00:00:00Z"
+        }
+      }
+    }
+  }
+}

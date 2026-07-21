@@ -6,15 +6,17 @@
 #define BANKINGSIMULATOR_ACCOUNTMANAGER_H
 
 #include <vector>
+#include <string>
+#include "Account.h"
 
 
 class AccountManager {
     public:
         AccountManager();
         static std::vector<Account> accounts;
-        static long long searchAccounts(); //returns vector index of found account
-private:
-
+        static Account& searchAccounts();
+        static void deleteAccount();
+        static void createAccount();
 };
 
 

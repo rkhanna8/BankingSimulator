@@ -4,61 +4,36 @@
 //Version 1.1
 #include <iostream>
 #include "Account.h"
+#include "AccountManager.h"
+#include <vector>
+#include <ctime>
+#include <cstdlib>
+#include "Utils.h"
 
-Account::Account(double initialBalance) {
-    balance = initialBalance;
-    std::string holderName;
-    std::cout<<"Enter the holder's full name: "<<std::endl;
-    std::cin>>holderName;
-    Account::holderName = holderName;
+Account::Account() {
+    balance = 0;
 
-    int accountTypeInt = 0;
-    std::string accountTypeString;
-    std::cout<<"Is this a checking (Enter 1) or savings (Enter 2) account?"<<std::endl;
-    while(true) {
-        std::cin>>accountTypeInt;
-        if (accountTypeInt == 1) {
-            accountTypeString = "checking";
-            break;
-        }
-        else if (accountTypeInt == 2) {
-            accountTypeString = "savings";
-            break;
-        }
-        else {
-            std::cout<<"Invalid input. Enter an integer, either 1 or 2: "<<std::endl;
-        }
-    }
-    std::cout<<"Account is a "<<accountTypeString<<" account."<<std::endl;
-    Account::accountType = accountTypeString;
+    holderName = Utils::getLineInput("Enter the holder's full name: \n");
 
-    //transactions.insert();
-    new Transaction("deposit",initialBalance,initialBalance,"Account initialization.");
-    //Check if the above transaction actually adds a transaction to right account.
-    //Learn more about arraylist amendments.
-
-    //How should account number assignment be done? How to save offline, manage a ton of accounts?
-    //Could be a 9-digit number, maybe simply just 000000001, then 000000002, and so on?
-    //Should I keep a global variable to track previous account initializations chronologically?
-    //Research how real banks assign account numbers?
+    initializeAccountType();
+    initializeAccountNumber();
 
     int pin = 0;
-    std::cout<<"Set a 4-digit pin: "<<std::endl;
-    while (getDigitCount(pin) != 4) {
-        std::cin>>pin;
-        if (getDigitCount(pin)==4) {
-            std::cout<<"Pin set. Your pin is "+std::to_string(pin)+"."<<std::endl;
+    std::cout<<"Set a 4-digit pin: \n";
+    while (Utils::getDigitCount(pin) != 4) {
+        pin = Utils::getIntInput("");
+        if (Utils::getDigitCount(pin)==4) {
+            std::cout<<"Pin set. Your pin is "+std::to_string(pin)+".\n";
             break;
         }
         else {
-            std::cout<<"Pin must be exactly 4 digits. Enter a valid pin: "<<std::endl;
+            std::cout<<"Pin must be exactly 4 digits. Enter a valid pin: \n\n";
         }
     }
     Account::pin = pin;
 
-
-    std::cout<<"Your account with an initial balance of $"<<initialBalance<<
-        "has been created."<<std::endl;
+    std::cout<<"Your account has been created with the following details: \n";
+    std::cout<<"Account number: "<<accountNumber<<"\nHolder name: "<<holderName<<"\nAccount type: "<<accountType<<"\nBalance: $"<<balance<<"\n";
 }
 
 std::string Account::getHolderName() {
@@ -66,17 +41,19 @@ std::string Account::getHolderName() {
 }
 
 void Account::initializeAccountNumber() {
-    srand(time(NULL));
-    std::string prefix = (rand() % 999999) + 100000 + ""; //6-digit random number.
+    srand(time(NULL)); //Not truly random, update later
+    std::string prefix = std::to_string((rand() % 999999) + 100000); //6-digit random number.
     /*To implement if there are concerns regarding duplicate random numbers,
-    but all accounts are already uniqye because of last 6 digits referring
+    but all accounts are already unique because of last 6 digits referring
     to the arrayList position of the account*/
     /*bool isUnique = false;
     while (!isUnique) {
         //Code to check if prefix is already taken
     }*/
 
-    std::string suffix = AccountManager::accounts.size()+"";
+
+
+    std::string suffix = std::to_string(AccountManager::accounts.size());
 
     //Determine digits to go in between prefix and suffix to keep a consistent 12-digit number
     std::string middleDigits;
@@ -99,6 +76,8 @@ void Account::initializeAccountNumber() {
         case 6:
             middleDigits = "";
             break;
+        default:
+            middleDigits = "00000";
     }
 
     accountNumber = prefix + middleDigits + suffix;
@@ -108,117 +87,81 @@ void Account::initializeAccountNumber() {
 void Account::initializeAccountType() {
     int accountTypeInt = 0;
     std::string accountTypeString;
-    std::cout<<"Is this a checking (Enter 1) or savings (Enter 2) account?"<<std::endl;
+    std::cout<<"Is this a checking (Enter 1) or savings (Enter 2) account?\n";
     while(true) {
-        std::cin>>accountTypeInt;
+        accountTypeInt = Utils::getIntInput("");
 
         switch (accountTypeInt) {
             case 1:
                 accountTypeString = "checking";
-                break;
+                std::cout<<"Account is a "<<accountTypeString<<" account.\n";
+                accountType = accountTypeString;
+                return;
             case 2:
                 accountTypeString = "savings";
-                break;
+                std::cout<<"Account is a "<<accountTypeString<<" account.\n";
+                accountType = accountTypeString;
+                return;
             default:
                 std::cout<<"Invalid input. Enter an integer, either 1 or 2:\n";
         }
-        else {
-            std::cout<<"Invalid input. Enter an integer, either 1 or 2: "<<std::endl;
-        }
     }
-    std::cout<<"Account is a "<<accountTypeString<<" account."<<std::endl;
-    Account::accountType = accountTypeString;
-}
-
-int Account::getDigitCount(int num) {
-    int digitCount = 0;
-    while (num/10 >= 1) {
-        digitCount++;
-        num=num/10;
-    }
-    return digitCount;
 }
 
 std::string Account::getAccountNumber() {
     return accountNumber;
 }
 
-
-double Account::deposit(double amount) {
-    if (amount<=0) {
-        std::cout<<"Invalid amount. Transaction unsuccessful.";
-    }
-    else {
-        balance+=amount;
-        std::cout<<"Deposit successful.";
-    }
-    return balance;
-}
-double Account::withdraw(double amount) {
-    if (amount>balance) {
-        std::cout<<"Insufficient funds. Transaction unsuccessful.";
-    }
-    else {
-        balance-=amount;
-        std::cout<<"Withdrawal successful";
-    }
-    return balance;
-}
 double Account::getBalance() const{
     return balance;
 }
-void Account::transfer(Account& toAccount, double amount) {
+
+void Account::deposit(double amount) {
+    if (amount<=0) {
+        std::cout<<"Invalid amount. Transaction unsuccessful.\n";
+    }
+    else {
+        balance+=amount;
+        std::cout<<"Deposit successful.\n";
+    }
+}
+void Account::withdraw(double amount) {
+    if (amount>balance) {
+        std::cout<<"Insufficient funds. Transaction unsuccessful.\n";
+    }
+    else {
+        balance-=amount;
+        std::cout<<"Withdrawal successful.\n";
+    }
+}
+/*void Account::transfer(Account& toAccount, double amount) {
     toAccount.deposit(amount);
     withdraw(amount);
-}
+}*/
 
 void Account::displayDetails() {
     if (!checkPin()) {
         return;
     }
     std::cout<<"Account number: "<<accountNumber<<"\nHolder name: "<<holderName<<"\nAccount type: "<<accountType<<"\nBalance: "<<balance<<"\n";
-    std::cout<<"Would you  like to check transaction history?\n1. Yes\n2. No";
-    int checkTransactionHistory;
-    std::cin>>checkTransactionHistory;
+    std::cout<<"Would you  like to check transaction history?\n1. Yes\n2. No\n";
+    int checkTransactionHistory = Utils::getIntInput("");
     while (true) {
         switch (checkTransactionHistory) {
             case 1:
-                std::cout<<"Transaction history: ";
+                std::cout<<"Transaction history: \n";
                 getTransactionHistory();
-                std::cout<<"Returning to main menu...";
-                break;
+                std::cout<<"Returning to main menu...\n";
+                return;
             case 2:
-                std::cout<<"Returning to main menu...";
-                break;
+                std::cout<<"Returning to main menu...\n";
+                return;
             default:
                 std::cout<<"Invalid input. Try again.\n";
-                std::cout<<"Would you  like to check transaction history?\n1. Yes\n2. No";
-                std::cin>>checkTransactionHistory;
+                std::cout<<"Would you  like to check transaction history?\n1. Yes\n2. No\n";
+                checkTransactionHistory = Utils::getIntInput("");
         }
     }
-
-}
-
-void Account::addTransaction() {
-    std::string type;
-    std::cout<<"Enter type of transaction: ";
-    std::cin>>type;
-    double trans_amount;
-    std::cout<<"Enter amount: ";
-    std::cin>>trans_amount;
-    double balanceAfter;
-    if (type=="Deposit") {
-        balanceAfter = deposit(trans_amount);
-    }
-    else if (type=="Withdrawal") {
-        balanceAfter = withdraw(trans_amount);
-    }
-    //if ()
-
-    std::string note;
-    std::cout<<"Enter note: ";
-    std::cin>>note;
-    transactions.push_back(Transaction(type, trans_amount, balanceAfter, note));
 }
 
 void Account::getTransactionHistory() {
@@ -227,31 +170,28 @@ void Account::getTransactionHistory() {
     }
 }
 
-bool Account:: checkPin() {
+bool Account::checkPin() const {
     int userPin;
-    std::cout<<"Enter your pin to continue";
+    std::cout<<"Enter your pin to continue: \n";
     for(int i=0;i<3;i++) {
-        std::cin>>userPin;
-        if(userPin == Account::pin) {
-            std::cout<<"Access granted.";
+        userPin = Utils::getIntInput("");
+        if(userPin == pin) {
+            std::cout<<"Access granted.\n";
             return true;
         }
         else {
-            i==2 ? std::cout<<"Too many attempts. You have been locked out." : std::cout<<"Invalid pin, try again";
+            i==2 ? std::cout<<"Too many attempts. You have been locked out.\n" : std::cout<<"Invalid pin, try again.\n";
         }
     }
     return false;
 }
-void Account::changePin() {
+void Account::changePin() {//not implemented yet
     if (checkPin()) {
-        int newPin;
-        std::cout<<"Enter new pin";
-        std::cin>>newPin;
-        Account::pin = newPin;
-        std::cout<<"Pin changed successfully";
+        int newPin = Utils::getIntInput("Enter new pin: \n");
+        pin = newPin;
+        std::cout<<"Pin changed successfully.\n";
     }
     else {
-        std::cout<<"Not authorized.";
+        std::cout<<"Not authorized.\n";
     }
 }
-

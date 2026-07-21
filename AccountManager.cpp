@@ -1,39 +1,65 @@
-//
-// Created by Rohan Khanna on 6/11/26.
-//
 
 #include "AccountManager.h"
 #include <vector>
+#include "Utils.h"
+
+std::vector<Account> AccountManager::accounts;
 
 
-long long AccountManager::searchAccounts() {
-    int searchType = 3;
+void AccountManager::deleteAccount() {
+    Account& toDelete = searchAccounts();
+    if (!toDelete.checkPin()) {
+        return;
+    }
+    size_t index = &toDelete - accounts.data();
+    if (index >= accounts.size()) {
+        std::cout<<"Invalid. Cannot delete account.\n";
+        return;
+    }
     while (true) {
-        std::cout<<"Search for an account: \n";
-        std::cout<<"Search by account number (1)\n";
-        std::cout<<"Search by holder name (2)\n";
+        std::cout<<"Are you sure you want to delete this account? This action cannot be undone.\n";
+        std::cout<<"1. Yes, delete this account\n";
+        std::cout<<"2. No, do not delete this account\n";
+        switch(int userInput = Utils::getIntInput("")) {
+            case 1:
+                accounts.erase(accounts.begin() + index);
+                std::cout<<"Account deleted. Returning to main menu...\n\n";
+                return;
+            case 2:
+                return;
+            default:
+                std::cout<<"Invalid input. Enter an integer 1 or 2: \n";
+        }
+    }
+}
+void AccountManager::createAccount() {
+    accounts.push_back(Account());
+}
+
+Account& AccountManager::searchAccounts() {
+    int searchType = 3;
+    std::cout<<"Search for an account: \n";
+    while (true) {
+        std::cout<<"1. Search by account number.\n";
+        std::cout<<"2. Search by holder name.\n";
         while(searchType<1 || searchType>2) {
-            std::cin>>searchType;
+            searchType = Utils::getIntInput("");
             if (searchType<1 || searchType>2) {
                 std::cout<<"Invalid input. Enter an integer 1-2: \n";
             }
         }
         if (searchType==1) {
-            std::cout<<"Search by 12-digit account number: \n";
-            std::string enteredAccountNumber;
-            std::cin>>enteredAccountNumber;
+            std::string enteredAccountNumber = Utils::getLineInput("Search by 12-digit account number: \n");
             for (long long i=0;i<accounts.size();i++){ //Linear search. Look at how to implement the most efficient searching algorithm for this.
                 if (accounts[i].getAccountNumber() == enteredAccountNumber) {
                     std::cout<<"Account number "<<enteredAccountNumber<<" found.\n";
-                    return i;
+                    return accounts[i];
                 }
             }
             std::cout<<"Account number not found. Try again.\n";
         }
         else {
-            std::cout<<"Search by holder name: \n";
-            std::string enteredHolderName;
-            std::cin>>enteredHolderName;
+            std::string enteredHolderName = Utils::getLineInput("Search by holder name: \n");
             std::vector<long long> foundIndex;
             for (long long i=0;i<accounts.size();i++){ //Linear search. Look at how to implement the most efficient searching algorithm for this.
                 if (accounts[i].getHolderName() == enteredHolderName) {
@@ -44,7 +70,7 @@ long long AccountManager::searchAccounts() {
                 std::cout<<"Account holder name not found.\n";
             }
             else if (foundIndex.size()==1) {
-                return foundIndex[0];
+                return accounts[foundIndex[0]];
             }
             else {
                 std::cout<<"Multiple accounts found. Select the account from the list below by entering the corresponding integer: \n";
@@ -56,15 +82,14 @@ long long AccountManager::searchAccounts() {
                 long long selectedAccount;
 
                 while (true) {
-                    std::cin>>selectedAccount;
+                    selectedAccount = Utils::getIntInput("");
                     if (selectedAccount >= 1 && selectedAccount <= foundIndex.size()) {
                         break;
                     }
                     std::cout<<"Invalid input. Enter an integer that corresponds to a listed account number: \n";
                 }
-                return foundIndex[selectedAccount - 1];
+                return accounts[foundIndex[selectedAccount - 1]];
             }
         }
     }
 }
-
