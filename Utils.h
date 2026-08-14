@@ -9,11 +9,9 @@
 
 class Utils {
     public:
-        static int getDigitCount(int num);
         static int getIntInput(const std::string& prompt);
         static double getDoubleInput(const std::string& prompt);
         static std::string getLineInput(const std::string& prompt);
 };
-
 
 #endif //BANKINGSIMULATOR_UTILS_H

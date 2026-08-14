@@ -1,0 +1,26 @@
+.DS_Store
+.idea/
+
+# CMake and IDE build output
+build/
+out/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+build.ninja
+.ninja_deps
+.ninja_log
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+CMakeUserPresets.json
+
+# Never commit Firebase or Google service-account private keys.
+*service-account*.json
+*serviceAccount*.json
+*.pem
+*.p12
+*.key

@@ -7,16 +7,6 @@
 #include <iostream>
 #include <limits>
 
-int Utils::getDigitCount(int num) {
-    int digitCount = 1;
-    while (num/10 >= 1) {
-        digitCount++;
-        num=num/10;
-    }
-    return digitCount;
-}
-
-
 int Utils::getIntInput(const std::string& prompt) {
     int value;
 

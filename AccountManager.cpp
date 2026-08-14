@@ -1,9 +1,40 @@
 
 #include "AccountManager.h"
+#include <iomanip>
 #include <vector>
 #include "Utils.h"
 
 std::vector<Account> AccountManager::accounts;
+
+Account& AccountManager::createAccount(
+    const std::string& holderName,
+    const std::string& accountType,
+    const std::string& pin
+) {
+    accounts.emplace_back(holderName, accountType, pin);
+    return accounts.back();
+}
+
+Account* AccountManager::findByAccountNumber(const std::string& accountNumber) {
+    for (Account& account : accounts) {
+        if (account.getAccountNumber() == accountNumber) {
+            return &account;
+        }
+    }
+
+    return nullptr;
+}
+
+bool AccountManager::removeByAccountNumber(const std::string& accountNumber) {
+    for (auto account = accounts.begin(); account != accounts.end(); ++account) {
+        if (account->getAccountNumber() == accountNumber) {
+            accounts.erase(account);
+            return true;
+        }
+    }
+
+    return false;
+}
 
 
 void AccountManager::deleteAccount() {
@@ -33,7 +64,50 @@ void AccountManager::deleteAccount() {
     }
 }
 void AccountManager::createAccount() {
-    accounts.push_back(Account());
+    std::string holderName;
+    while (holderName.empty()) {
+        holderName = Utils::getLineInput("Enter the holder's full name: \n");
+        if (holderName.empty()) {
+            std::cout << "Holder name is required.\n";
+        }
+    }
+
+    std::string accountType;
+    while (accountType.empty()) {
+        const int selection = Utils::getIntInput(
+            "Is this a checking (Enter 1) or savings (Enter 2) account?\n"
+        );
+
+        if (selection == 1) {
+            accountType = "checking";
+        }
+        else if (selection == 2) {
+            accountType = "savings";
+        }
+        else {
+            std::cout << "Invalid input. Enter 1 or 2.\n";
+        }
+    }
+
+    std::string pin;
+    while (pin.length() != 4 ||
+           pin.find_first_not_of("0123456789") != std::string::npos) {
+        pin = Utils::getLineInput("Set a 4-digit PIN: \n");
+        if (pin.length() != 4 ||
+            pin.find_first_not_of("0123456789") != std::string::npos) {
+            std::cout << "PIN must contain exactly four digits.\n";
+        }
+    }
+
+    const Account& account = createAccount(holderName, accountType, pin);
+
+    std::cout << "Your account has been created with the following details:\n"
+              << "Account number: " << account.getAccountNumber()
+              << "\nHolder name: " << account.getHolderName()
+              << "\nAccount type: " << account.getAccountType()
+              << "\nBalance: $" << std::fixed << std::setprecision(2)
+              << static_cast<double>(account.getBalanceCents()) / 100.0
+              << "\n";
 }
 
 Account& AccountManager::searchAccounts() {
@@ -50,11 +124,10 @@ Account& AccountManager::searchAccounts() {
         }
         if (searchType==1) {
             std::string enteredAccountNumber = Utils::getLineInput("Search by 12-digit account number: \n");
-            for (long long i=0;i<accounts.size();i++){ //Linear search. Look at how to implement the most efficient searching algorithm for this.
-                if (accounts[i].getAccountNumber() == enteredAccountNumber) {
-                    std::cout<<"Account number "<<enteredAccountNumber<<" found.\n";
-                    return accounts[i];
-                }
+            Account* account = findByAccountNumber(enteredAccountNumber);
+            if (account != nullptr) {
+                std::cout<<"Account number "<<enteredAccountNumber<<" found.\n";
+                return *account;
             }
             std::cout<<"Account number not found. Try again.\n";
         }

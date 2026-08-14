@@ -1,149 +1,131 @@
 //
 // Created by Rohan Khanna on 4/29/26.
 //
-//Version 1.1
 #include <iostream>
+#include <iomanip>
+#include <algorithm>
+#include <cctype>
+#include <stdexcept>
+#include <utility>
 #include "Account.h"
-#include "AccountManager.h"
-#include <vector>
-#include <ctime>
-#include <cstdlib>
+#include "PinHasher.h"
+#include "SecureRandom.h"
 #include "Utils.h"
 
-Account::Account() {
-    balance = 0;
+namespace {
+std::string trim(std::string value) {
+    const auto first = std::find_if_not(value.begin(), value.end(), [](char c) {
+        return std::isspace(static_cast<unsigned char>(c));
+    });
+    const auto last = std::find_if_not(value.rbegin(), value.rend(), [](char c) {
+        return std::isspace(static_cast<unsigned char>(c));
+    }).base();
 
-    holderName = Utils::getLineInput("Enter the holder's full name: \n");
-
-    initializeAccountType();
-    initializeAccountNumber();
-
-    int pin = 0;
-    std::cout<<"Set a 4-digit pin: \n";
-    while (Utils::getDigitCount(pin) != 4) {
-        pin = Utils::getIntInput("");
-        if (Utils::getDigitCount(pin)==4) {
-            std::cout<<"Pin set. Your pin is "+std::to_string(pin)+".\n";
-            break;
-        }
-        else {
-            std::cout<<"Pin must be exactly 4 digits. Enter a valid pin: \n\n";
-        }
+    if (first >= last) {
+        return "";
     }
-    Account::pin = pin;
-
-    std::cout<<"Your account has been created with the following details: \n";
-    std::cout<<"Account number: "<<accountNumber<<"\nHolder name: "<<holderName<<"\nAccount type: "<<accountType<<"\nBalance: $"<<balance<<"\n";
+    return std::string(first, last);
 }
 
-std::string Account::getHolderName() {
+bool containsControlCharacter(const std::string& value) {
+    return std::any_of(value.begin(), value.end(), [](char c) {
+        return std::iscntrl(static_cast<unsigned char>(c));
+    });
+}
+}
+
+Account::Account(
+    std::string holderName,
+    std::string accountType,
+    std::string pin
+)
+    : balanceCents(0),
+      holderName(std::move(holderName)),
+      accountType(std::move(accountType)) {
+    this->holderName = trim(std::move(this->holderName));
+
+    if (this->holderName.empty()) {
+        throw std::invalid_argument("Holder name is required.");
+    }
+    if (this->holderName.length() > 100 ||
+        containsControlCharacter(this->holderName)) {
+        throw std::invalid_argument(
+            "Holder name must be 100 characters or fewer and cannot contain "
+            "control characters."
+        );
+    }
+
+    if (this->accountType != "checking" && this->accountType != "savings") {
+        throw std::invalid_argument("Account type must be checking or savings.");
+    }
+
+    if (pin.length() != 4 ||
+        pin.find_first_not_of("0123456789") != std::string::npos) {
+        throw std::invalid_argument("PIN must contain exactly four digits.");
+    }
+
+    pinHash = PinHasher::hash(pin);
+    initializeAccountNumber();
+}
+
+const std::string& Account::getHolderName() const {
     return holderName;
 }
 
 void Account::initializeAccountNumber() {
-    srand(time(NULL)); //Not truly random, update later
-    std::string prefix = std::to_string((rand() % 999999) + 100000); //6-digit random number.
-    /*To implement if there are concerns regarding duplicate random numbers,
-    but all accounts are already unique because of last 6 digits referring
-    to the arrayList position of the account*/
-    /*bool isUnique = false;
-    while (!isUnique) {
-        //Code to check if prefix is already taken
-    }*/
-
-
-
-    std::string suffix = std::to_string(AccountManager::accounts.size());
-
-    //Determine digits to go in between prefix and suffix to keep a consistent 12-digit number
-    std::string middleDigits;
-    switch (suffix.length()) {
-        case 1:
-            middleDigits = "00000";
-            break;
-        case 2:
-            middleDigits = "0000";
-            break;
-        case 3:
-            middleDigits = "000";
-            break;
-        case 4:
-            middleDigits = "00";
-            break;
-        case 5:
-            middleDigits = "0";
-            break;
-        case 6:
-            middleDigits = "";
-            break;
-        default:
-            middleDigits = "00000";
-    }
-
-    accountNumber = prefix + middleDigits + suffix;
-    //Limits to 1 million accounts that can be assigned
+    accountNumber = SecureRandom::numericString(12);
 }
 
-void Account::initializeAccountType() {
-    int accountTypeInt = 0;
-    std::string accountTypeString;
-    std::cout<<"Is this a checking (Enter 1) or savings (Enter 2) account?\n";
-    while(true) {
-        accountTypeInt = Utils::getIntInput("");
-
-        switch (accountTypeInt) {
-            case 1:
-                accountTypeString = "checking";
-                std::cout<<"Account is a "<<accountTypeString<<" account.\n";
-                accountType = accountTypeString;
-                return;
-            case 2:
-                accountTypeString = "savings";
-                std::cout<<"Account is a "<<accountTypeString<<" account.\n";
-                accountType = accountTypeString;
-                return;
-            default:
-                std::cout<<"Invalid input. Enter an integer, either 1 or 2:\n";
-        }
-    }
-}
-
-std::string Account::getAccountNumber() {
+const std::string& Account::getAccountNumber() const {
     return accountNumber;
 }
 
-double Account::getBalance() const{
-    return balance;
+const std::string& Account::getAccountType() const {
+    return accountType;
 }
 
-void Account::deposit(double amount) {
-    if (amount<=0) {
+long long Account::getBalanceCents() const {
+    return balanceCents;
+}
+
+bool Account::verifyPin(const std::string& candidatePin) const {
+    return PinHasher::verify(pinHash, candidatePin);
+}
+
+const std::string& Account::getPinHash() const {
+    return pinHash;
+}
+
+void Account::deposit(long long amountCents) {
+    if (amountCents <= 0) {
         std::cout<<"Invalid amount. Transaction unsuccessful.\n";
     }
     else {
-        balance+=amount;
+        balanceCents += amountCents;
         std::cout<<"Deposit successful.\n";
     }
 }
-void Account::withdraw(double amount) {
-    if (amount>balance) {
+void Account::withdraw(long long amountCents) {
+    if (amountCents <= 0) {
+        std::cout<<"Invalid amount. Transaction unsuccessful.\n";
+    }
+    else if (amountCents > balanceCents) {
         std::cout<<"Insufficient funds. Transaction unsuccessful.\n";
     }
     else {
-        balance-=amount;
+        balanceCents -= amountCents;
         std::cout<<"Withdrawal successful.\n";
     }
 }
-/*void Account::transfer(Account& toAccount, double amount) {
-    toAccount.deposit(amount);
-    withdraw(amount);
-}*/
-
 void Account::displayDetails() {
     if (!checkPin()) {
         return;
     }
-    std::cout<<"Account number: "<<accountNumber<<"\nHolder name: "<<holderName<<"\nAccount type: "<<accountType<<"\nBalance: "<<balance<<"\n";
+    std::cout << "Account number: " << accountNumber
+              << "\nHolder name: " << holderName
+              << "\nAccount type: " << accountType
+              << "\nBalance: $" << std::fixed << std::setprecision(2)
+              << static_cast<double>(balanceCents) / 100.0 << "\n";
     std::cout<<"Would you  like to check transaction history?\n1. Yes\n2. No\n";
     int checkTransactionHistory = Utils::getIntInput("");
     while (true) {
@@ -171,11 +153,10 @@ void Account::getTransactionHistory() {
 }
 
 bool Account::checkPin() const {
-    int userPin;
     std::cout<<"Enter your pin to continue: \n";
     for(int i=0;i<3;i++) {
-        userPin = Utils::getIntInput("");
-        if(userPin == pin) {
+        const std::string userPin = Utils::getLineInput("");
+        if(verifyPin(userPin)) {
             std::cout<<"Access granted.\n";
             return true;
         }
@@ -185,11 +166,17 @@ bool Account::checkPin() const {
     }
     return false;
 }
-void Account::changePin() {//not implemented yet
+void Account::changePin() {
     if (checkPin()) {
-        int newPin = Utils::getIntInput("Enter new pin: \n");
-        pin = newPin;
-        std::cout<<"Pin changed successfully.\n";
+        const std::string newPin = Utils::getLineInput("Enter new 4-digit pin: \n");
+        if (newPin.length() == 4 &&
+            newPin.find_first_not_of("0123456789") == std::string::npos) {
+            pinHash = PinHasher::hash(newPin);
+            std::cout<<"Pin changed successfully.\n";
+        }
+        else {
+            std::cout<<"PIN must contain exactly four digits.\n";
+        }
     }
     else {
         std::cout<<"Not authorized.\n";

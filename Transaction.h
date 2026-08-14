@@ -11,24 +11,16 @@ class Transaction {
 
 private:
     std::string type;
-    double trans_amount;
-    double balanceAfter;
-    std::string note;
+    long long transAmountCents;
+    long long balanceAfterCents;
 public:
-
     Transaction();
 
     std::string getType() const;
-    double getTransAmount() const;
-    double getBalanceAfter() const;
-    //std::string getNote() const;
+    long long getTransAmountCents() const;
+    long long getBalanceAfterCents() const;
     void initializeTransactionType();
-
     void display() const;
-
-
 };
-
-
 
 #endif //BANKINGSIMULATOR_TRANSACTION_H

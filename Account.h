@@ -5,43 +5,36 @@
 #ifndef BANKINGSIMULATOR_ACCOUNT_H
 #define BANKINGSIMULATOR_ACCOUNT_H
 
+#include <string>
 #include <vector>
 #include "Transaction.h"
 
 class Account {
 private:
-    double balance;
-    int pin;
+    long long balanceCents;
+    std::string pinHash;
     std::string accountNumber;
     std::string holderName;
     std::string accountType;
-    void initializeAccountType();
     void initializeAccountNumber();
 
 public:
-    Account();
+    Account(std::string holderName, std::string accountType, std::string pin);
 
     std::vector<Transaction> transactions;
 
-    void newTransaction();
-    void deposit(double amount);
-    void withdraw(double amount);
-    double getBalance() const; //These four are all declarations of methods that will be written in Account.cpp
-    //void transfer(Account& toAccount, double amount);
+    void deposit(long long amountCents);
+    void withdraw(long long amountCents);
+    long long getBalanceCents() const;
+    bool verifyPin(const std::string& candidatePin) const;
+    const std::string& getPinHash() const;
     bool checkPin() const;
     void changePin();
     void getTransactionHistory();
-    std::string getHolderName();
-    std::string getAccountType();
-    void setAccountType(std::string accountType);
-    std::string getAccountNumber();
+    const std::string& getHolderName() const;
+    const std::string& getAccountType() const;
+    const std::string& getAccountNumber() const;
     void displayDetails();
-    static int getDigitCount(int num);
-
-
-
 };
-
-
 
 #endif //BANKINGSIMULATOR_ACCOUNT_H

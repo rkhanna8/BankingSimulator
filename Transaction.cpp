@@ -3,6 +3,8 @@
 //
 
 #include "Transaction.h"
+#include <cmath>
+#include <iomanip>
 #include "Account.h"
 #include "AccountManager.h"
 #include "Utils.h"
@@ -18,15 +20,15 @@ Transaction::Transaction() {
         while (trans_amount1 <= 0) {
             trans_amount1 = Utils::getDoubleInput("Invalid amount. Enter a number greater than 0.\n");
         }
-        trans_amount = trans_amount1;
+        transAmountCents = std::llround(trans_amount1 * 100.0);
 
         if (type == "deposit") {
-            account.deposit(trans_amount);
+            account.deposit(transAmountCents);
         }
         else {
-            account.withdraw(trans_amount);
+            account.withdraw(transAmountCents);
         }
-        balanceAfter = account.getBalance();
+        balanceAfterCents = account.getBalanceCents();
 
         account.transactions.push_back(*this);
     }
@@ -56,18 +58,19 @@ void Transaction::initializeTransactionType() {
     }
 }
 
-double Transaction::getTransAmount() const {
-    return trans_amount;
+long long Transaction::getTransAmountCents() const {
+    return transAmountCents;
 }
 void Transaction::display() const {
-    std::cout<<"Type: "<<type<<"\nAmount: "<<trans_amount<<"\nBalance after: "<<balanceAfter<<"\n";
+    std::cout << "Type: " << type
+              << "\nAmount: $" << std::fixed << std::setprecision(2)
+              << static_cast<double>(transAmountCents) / 100.0
+              << "\nBalance after: $"
+              << static_cast<double>(balanceAfterCents) / 100.0 << "\n";
 }
-double Transaction::getBalanceAfter() const {
-    return balanceAfter;
+long long Transaction::getBalanceAfterCents() const {
+    return balanceAfterCents;
 }
-/*std::string Transaction::getNote() const {
-    return note;
-}*/
 std::string Transaction::getType() const {
     return type;
 }

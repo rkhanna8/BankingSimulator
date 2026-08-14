@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A local C++ and Firebase banking simulator.">
+    <title>Banking Simulator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+    <div id="server-status" class="server-status checking" role="status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Checking local server</span>
+    </div>
+</header>
+
+<main class="page-shell">
+    <section id="welcome-view" aria-labelledby="welcome-title">
+        <div class="hero">
+            <h1 id="welcome-title">Banking Simulator</h1>
+            <p class="ai-disclosure">
+                This html for this website was generated with AI, but the rest of the application was hand coded
+            </p>
+        </div>
+
+        <div class="entry-grid">
+            <article class="panel entry-panel">
+                <div class="panel-icon blue" aria-hidden="true">+</div>
+                <div>
+                    <p class="eyebrow">New customer</p>
+                    <h2>Create an account</h2>
+                    <p class="supporting-text">Open a checking or savings demo account in seconds.</p>
+                </div>
+                <form id="create-account-form">
+                    <label for="holder-name">Full name</label>
+                    <input id="holder-name" name="holderName" type="text"
+                           autocomplete="name" maxlength="100" required>
+
+                    <label for="account-type">Account type</label>
+                    <select id="account-type" name="accountType" required>
+                        <option value="checking">Checking</option>
+                        <option value="savings">Savings</option>
+                    </select>
+
+                    <label for="create-pin">Create a 4-digit PIN</label>
+                    <input id="create-pin" name="pin" type="password"
+                           inputmode="numeric" autocomplete="new-password"
+                           minlength="4" maxlength="4" pattern="[0-9]{4}" required>
+
+                    <button class="button primary" type="submit">Create account</button>
+                </form>
+            </article>
+
+            <article class="panel entry-panel">
+                <div class="panel-icon green" aria-hidden="true">&#8594;</div>
+                <div>
+                    <p class="eyebrow">Returning customer</p>
+                    <h2>Access your account</h2>
+                    <p class="supporting-text">Use your 12-digit account number and PIN.</p>
+                </div>
+                <form id="access-account-form">
+                    <label for="account-number">Account number</label>
+                    <input id="account-number" name="accountNumber" type="text"
+                           inputmode="numeric" autocomplete="off" maxlength="12"
+                           pattern="[0-9]{12}" placeholder="000000000000" required>
+
+                    <label for="access-pin">4-digit PIN</label>
+                    <input id="access-pin" name="pin" type="password"
+                           inputmode="numeric" autocomplete="current-password"
+                           minlength="4" maxlength="4" pattern="[0-9]{4}" required>
+
+                    <button class="button primary" type="submit">Access account</button>
+                </form>
+            </article>
+
+            <article class="panel search-panel">
+                <div class="search-copy">
+                    <div class="panel-icon amber" aria-hidden="true">?</div>
+                    <div>
+                        <p class="eyebrow">Forgot the number?</p>
+                        <h2>Search by holder name</h2>
+                        <p class="supporting-text">
+                            Enter the exact full name. For privacy, results show no balance or history;
+                            a PIN is still required to access an account.
+                        </p>
+                    </div>
+                </div>
+                <form id="holder-search-form" class="inline-form">
+                    <div class="field-grow">
+                        <label for="search-holder-name">Exact full name</label>
+                        <input id="search-holder-name" name="holderName" type="text"
+                               autocomplete="off" maxlength="100" required>
+                    </div>
+                    <button class="button secondary" type="submit">Search</button>
+                </form>
+                <div id="search-results" class="search-results" hidden></div>
+            </article>
+        </div>
+    </section>
+
+    <section id="dashboard-view" class="dashboard" aria-labelledby="dashboard-title" hidden>
+        <div class="dashboard-heading">
+            <div>
+                <p class="eyebrow">Account overview</p>
+                <h1 id="dashboard-title">Welcome, <span id="dashboard-name"></span></h1>
+            </div>
+            <button id="exit-account-button" class="button ghost compact" type="button">
+                Exit to main menu
+            </button>
+        </div>
+
+        <div class="summary-grid">
+            <article class="balance-card">
+                <div class="balance-card-top">
+                    <span id="account-type-badge" class="account-badge"></span>
+                </div>
+                <p>Available balance</p>
+                <strong id="account-balance">$0.00</strong>
+                <div class="account-number-row">
+                    <span>Account number</span>
+                    <span id="dashboard-account-number"></span>
+                </div>
+            </article>
+
+            <article class="panel quick-info">
+                <p class="eyebrow">Account details</p>
+                <dl>
+                    <div><dt>Holder</dt><dd id="detail-holder"></dd></div>
+                    <div><dt>Account type</dt><dd id="detail-type"></dd></div>
+                    <div><dt>Status</dt><dd><span class="active-pill">Active</span></dd></div>
+                </dl>
+            </article>
+        </div>
+
+        <div class="workspace-grid">
+            <div class="main-column">
+                <article class="panel">
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow">Move money</p>
+                            <h2>Make a transaction</h2>
+                        </div>
+                    </div>
+                    <div class="transaction-grid">
+                        <form id="deposit-form" class="action-form">
+                            <div class="action-title"><span class="action-symbol deposit">+</span><h3>Deposit</h3></div>
+                            <label for="deposit-amount">Amount</label>
+                            <div class="money-input"><span>$</span><input id="deposit-amount" type="text"
+                                inputmode="decimal" placeholder="0.00" autocomplete="off" required></div>
+                            <button class="button primary" type="submit">Add funds</button>
+                        </form>
+
+                        <form id="withdraw-form" class="action-form">
+                            <div class="action-title"><span class="action-symbol withdrawal">&#8722;</span><h3>Withdraw</h3></div>
+                            <label for="withdraw-amount">Amount</label>
+                            <div class="money-input"><span>$</span><input id="withdraw-amount" type="text"
+                                inputmode="decimal" placeholder="0.00" autocomplete="off" required></div>
+                            <button class="button secondary" type="submit">Withdraw funds</button>
+                        </form>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="section-heading history-heading">
+                        <div><p class="eyebrow">Activity</p><h2>Transaction history</h2></div>
+                        <span id="transaction-count" class="count-pill">0 transactions</span>
+                    </div>
+                    <div id="transaction-list" class="transaction-list"></div>
+                </article>
+            </div>
+
+            <aside class="side-column">
+                <article class="panel">
+                    <p class="eyebrow">Security</p>
+                    <h2>Change PIN</h2>
+                    <p class="supporting-text">Choose a new 4-digit PIN for this account.</p>
+                    <form id="change-pin-form">
+                        <label for="new-pin">New PIN</label>
+                        <input id="new-pin" type="password" inputmode="numeric"
+                               autocomplete="new-password" minlength="4" maxlength="4"
+                               pattern="[0-9]{4}" required>
+                        <label for="confirm-pin">Confirm new PIN</label>
+                        <input id="confirm-pin" type="password" inputmode="numeric"
+                               autocomplete="new-password" minlength="4" maxlength="4"
+                               pattern="[0-9]{4}" required>
+                        <button class="button secondary" type="submit">Update PIN</button>
+                    </form>
+                </article>
+
+                <article class="panel danger-zone">
+                    <p class="eyebrow danger-text">Danger zone</p>
+                    <h2>Delete account</h2>
+                    <p class="supporting-text">Permanently remove this demo account and its history.</p>
+                    <button id="open-delete-dialog" class="button danger" type="button">Delete account</button>
+                </article>
+            </aside>
+        </div>
+    </section>
+</main>
+
+<dialog id="delete-dialog" class="confirm-dialog">
+    <form id="delete-account-form">
+        <div class="dialog-icon" aria-hidden="true">!</div>
+        <h2>Delete this account?</h2>
+        <p>This permanently removes the account and its transaction history from Firebase.</p>
+        <label for="delete-confirmation">Type <strong>DELETE</strong> to confirm</label>
+        <input id="delete-confirmation" type="text" autocomplete="off" required>
+        <div class="dialog-actions">
+            <button id="cancel-delete" class="button ghost" type="button">Cancel</button>
+            <button class="button danger" type="submit">Delete permanently</button>
+        </div>
+    </form>
+</dialog>
+
+<div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+<script src="app.js"></script>
+</body>
+</html>
