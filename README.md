@@ -201,25 +201,3 @@ BankingSimulator/
 ├── tests/                    # CTest security checks
 └── FIREBASE_SETUP.md         # Firebase and CLion configuration
 ```
-
-## Security scope and limitations
-
-This project demonstrates secure development practices, but it is not a
-production banking system:
-
-- Firebase Authentication and user ownership rules are not implemented.
-- Temporary public Firebase rules must only be used with fictional test data.
-- The local HTTP server binds to loopback and does not provide TLS.
-- The website is served by the C++ process and its features require that process
-  to be running. It is not a standalone hosted frontend.
-- Exact holder-name search intentionally reveals limited account-discovery data
-  for this fictional portfolio demo; a production system should use authenticated
-  ownership-based account discovery instead.
-- Transfers are not part of the current simulator.
-- Request throttling and automatic PIN lockouts are not implemented.
-- Production auditing, compliance, rate limiting, key management, and disaster
-  recovery are outside this project's scope.
-
-The PIN is intentionally limited to four digits to match the simulator design.
-Argon2id slows offline guessing, but a four-digit PIN still has a very small
-search space and must not be treated like a strong password.
