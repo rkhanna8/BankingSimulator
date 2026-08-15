@@ -44,13 +44,11 @@ std::string SecureRandom::numericString(std::size_t digitCount) {
     while (result.length() < digitCount) {
         for (const std::uint8_t byte : bytes(32)) {
             if (result.empty()) {
-                // 252 is divisible by 9, preventing modulo bias for digits 1-9.
                 if (byte < 252) {
                     result.push_back(static_cast<char>('1' + (byte % 9)));
                 }
             }
             else if (byte < 250) {
-                // 250 is divisible by 10, preventing modulo bias for digits 0-9.
                 result.push_back(static_cast<char>('0' + (byte % 10)));
             }
 

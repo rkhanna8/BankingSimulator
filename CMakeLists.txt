@@ -83,11 +83,6 @@ add_executable(
         main.cpp
         FirebaseDatabase.cpp
         FirebaseDatabase.h
-
-        firebase-banking-data.json
-        firebase.rules.json
-        .env.example
-        FIREBASE_SETUP.md
         README.md
 
         web/index.html
@@ -113,12 +108,6 @@ add_custom_target(
 )
 
 add_dependencies(BankingSimulator BankingWebFiles)
-
-configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/firebase-banking-data.json
-        ${CMAKE_CURRENT_BINARY_DIR}/firebase-banking-data.json
-        COPYONLY
-)
 
 include(CTest)
 if(BUILD_TESTING)

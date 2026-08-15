@@ -143,9 +143,6 @@ void runApiAction(
 
 int runServer(FirebaseDatabase& firebase) {
     httplib::Server server;
-
-    // cpp-httplib enables SO_REUSEPORT by default on macOS. Disable it so an
-    // older simulator cannot keep serving alongside a newly-started build.
     server.set_socket_options([](socket_t socket) {
         httplib::set_socket_opt(socket, SOL_SOCKET, SO_REUSEADDR, 1);
 #ifdef SO_REUSEPORT
@@ -153,16 +150,11 @@ int runServer(FirebaseDatabase& firebase) {
 #endif
     });
 
-    // Account pages contain sensitive-looking demo data, and frontend files
-    // change frequently during development. Always make the browser reload
-    // the current files from the local server.
     server.set_default_headers({
         {"Cache-Control", "no-store, max-age=0"},
         {"Pragma", "no-cache"}
     });
 
-    // AccountManager owns the newly-created in-memory Account long enough for
-    // Firebase persistence. Serial processing keeps its vector references safe.
     server.new_task_queue = [] {
         return new httplib::ThreadPool(1);
     };

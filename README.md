@@ -52,141 +52,15 @@ Browser (HTML/CSS/JavaScript)
 The browser never talks directly to Firebase and never receives a PIN or PIN
 hash. The C++ server validates requests and controls persistence.
 
-## Requirements
+## Engineering highlights
 
-- CMake 3.20 or newer
-- A C++20 compiler
-- libcurl development files
-- Git, used by CMake to fetch pinned dependencies
-- A Firebase project with Realtime Database enabled
-
-CMake fetches `cpp-httplib`, `nlohmann/json`, and the reference Argon2 library.
-
-## Firebase configuration
-
-Follow [FIREBASE_SETUP.md](FIREBASE_SETUP.md). At minimum, the run environment
-must contain:
-
-```text
-FIREBASE_DATABASE_URL=https://YOUR_DATABASE_NAME.firebaseio.com
-```
-
-Do not commit access tokens, ID tokens, database secrets, or service-account
-private keys. The included `.env.example` contains names and placeholders only.
-
-## Build and run locally
-
-```bash
-cmake -S . -B build
-cmake --build build
-./build/BankingSimulator
-```
-
-Open <http://127.0.0.1:8080> after the server starts.
-
-The application deliberately binds to the local machine only. The C++ process
-serves both the website and the API, so opening `web/index.html` directly will
-not work.
-
-## API
-
-### Health check
-
-```http
-GET /api/health
-```
-
-### Create an account
-
-```http
-POST /api/accounts
-Content-Type: application/json
-
-{
-  "holderName": "Portfolio User",
-  "accountType": "checking",
-  "pin": "0123"
-}
-```
-
-### Access an account
-
-```http
-POST /api/accounts/{12-digit-account-number}/access
-Content-Type: application/json
-
-{
-  "pin": "0123"
-}
-```
-
-### Search by exact holder name
-
-```http
-POST /api/accounts/search
-Content-Type: application/json
-
-{
-  "holderName": "Portfolio User"
-}
-```
-
-Search results expose only holder name, account type, and account number. A PIN
-is still required to access balances or history.
-
-### Deposit or withdraw
-
-```http
-POST /api/accounts/{12-digit-account-number}/transactions
-Content-Type: application/json
-
-{
-  "pin": "0123",
-  "type": "deposit",
-  "amountCents": 2500
-}
-```
-
-Use `"withdrawal"` for a withdrawal. Insufficient funds are rejected.
-
-### Change a PIN
-
-```http
-POST /api/accounts/{12-digit-account-number}/pin
-Content-Type: application/json
-
-{
-  "pin": "0123",
-  "newPin": "4567"
-}
-```
-
-### Delete an account
-
-```http
-DELETE /api/accounts/{12-digit-account-number}
-Content-Type: application/json
-
-{
-  "pin": "4567"
-}
-```
-
-All account-detail responses intentionally omit `pinHash`. The frontend keeps
-the entered PIN only in page memory and clears it when the user exits the
-account, deletes it, or refreshes the page.
-
-## Tests
-
-```bash
-ctest --test-dir build --output-on-failure
-```
-
-The security test verifies input validation, account-number shape, Argon2id
-hash creation, correct-PIN verification, and wrong-PIN rejection.
-
-The same build and test sequence runs automatically for pushes and pull
-requests through GitHub Actions.
+- Account and transaction amounts use integer cents rather than floating-point
+  values.
+- PIN hashes and salts never leave the C++/Firebase boundary in API responses.
+- Firebase ETags protect balance-changing operations from conflicting writes.
+- The frontend keeps an entered PIN only in page memory and clears it when the
+  user exits an account, deletes it, or refreshes the page.
+- GitHub Actions builds the project and runs its CTest security checks.
 
 ## Repository structure
 
@@ -199,5 +73,5 @@ BankingSimulator/
 ├── SecureRandom.*            # Secure account and transaction identifiers
 ├── web/                      # Browser frontend
 ├── tests/                    # CTest security checks
-└── FIREBASE_SETUP.md         # Firebase and CLion configuration
+└── CMakeLists.txt            # Build configuration
 ```
